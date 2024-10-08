@@ -1,4 +1,3 @@
-// MainScreen.js
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -22,17 +21,18 @@ class MainScreen extends Component {
 
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
+      // Save the current question index in localStorage
       localStorage.setItem('currentQuestionIndex', question.index);
     });
 
     this.socket.on('result', (data) => {
-      const message = data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!';
+      const message = `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}`;
       this.setState({ result: message });
     });
 
     this.socket.on('end_game', (data) => {
       this.setState({ gameEnded: true, result: data.message });
-      localStorage.removeItem('currentQuestionIndex');
+      localStorage.removeItem('currentQuestionIndex'); // Clear the stored index when the game ends
     });
   }
 
