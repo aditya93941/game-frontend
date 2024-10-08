@@ -5,6 +5,7 @@ class PlayerComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      playerName: '',
       currentQuestion: null,
       selectedAnswer: '',
       result: '',
@@ -21,11 +22,12 @@ class PlayerComponent extends Component {
 
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
+      // Save the current question index in localStorage
       localStorage.setItem('currentQuestionIndex', question.index);
     });
 
     this.socket.on('result', (data) => {
-      this.setState({ result: data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!' });
+      this.setState({ result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}` });
     });
 
     this.socket.on('end_game', (data) => {
@@ -43,7 +45,7 @@ class PlayerComponent extends Component {
       return;
     }
 
-    this.socket.emit('submit_answer', { answer: selectedAnswer });
+    this.socket.emit('submit_answer', { playerName: this.state.playerName, answer: selectedAnswer });
   };
 
   handleAnswerChange = (e) => {
@@ -51,7 +53,7 @@ class PlayerComponent extends Component {
   };
 
   render() {
-    const { currentQuestion, result, gameEnded } = this.state;
+    const { currentQuestion, result, playerName, gameEnded } = this.state;
 
     if (gameEnded) {
       return <h1 className="game-end">{result}</h1>;
@@ -59,7 +61,13 @@ class PlayerComponent extends Component {
 
     return (
       <div className="container">
-        {currentQuestion && (
+        {!playerName && (
+          <div>
+            <h2>Enter your name</h2>
+            <input type="text" onChange={(e) => this.setState({ playerName: e.target.value })} />
+          </div>
+        )}
+        {currentQuestion && playerName && (
           <div>
             <h2>{currentQuestion.question}</h2>
             <form onSubmit={this.handleSubmit}>
