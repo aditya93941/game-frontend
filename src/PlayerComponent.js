@@ -84,6 +84,7 @@ class PlayerComponent extends Component {
               onChange={this.handleNameChange}
               placeholder="Your Name"
             />
+            {result && <h3 className="result">{result}</h3>} {/* Show error message if needed */}
           </div>
         )}
         {currentQuestion && playerName && (
