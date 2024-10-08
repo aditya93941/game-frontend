@@ -83,6 +83,7 @@ class PlayerComponent extends Component {
               value={playerName}
               onChange={this.handleNameChange}
               placeholder="Your Name"
+              autoFocus // Automatically focus on the input when rendering
             />
             {result && <h3 className="result">{result}</h3>} {/* Show error message if needed */}
           </div>
