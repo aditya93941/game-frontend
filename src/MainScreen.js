@@ -31,7 +31,7 @@ class MainScreen extends Component {
 
   render() {
     const { currentQuestion, result, gameEnded } = this.state;
-    const qrCodeUrl = 'http://localhost:3000/player';
+    const qrCodeUrl = 'https://kbcgame-drab.vercel.app/player';
 
     if (gameEnded) {
       return <h1>{result}</h1>;
