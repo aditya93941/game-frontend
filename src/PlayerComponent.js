@@ -5,6 +5,7 @@ class PlayerComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      playerName: '',
       currentQuestion: null,
       selectedAnswer: '',
       result: '',
@@ -15,6 +16,10 @@ class PlayerComponent extends Component {
 
   componentDidMount() {
     const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
+    const savedPlayerName = localStorage.getItem('playerName');
+    if (savedPlayerName) {
+      this.setState({ playerName: savedPlayerName });
+    }
     if (savedQuestionIndex) {
       this.socket.emit('resume_game', { questionIndex: savedQuestionIndex });
     }
@@ -29,17 +34,23 @@ class PlayerComponent extends Component {
     });
 
     this.socket.on('end_game', (data) => {
-      this.setState({ gameEnded: true, result: data.message });
+      const message = `${data.message} Player: ${this.state.playerName}`;
+      this.setState({ gameEnded: true, result: message });
       localStorage.removeItem('currentQuestionIndex');
     });
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    const { selectedAnswer } = this.state;
+    const { selectedAnswer, playerName } = this.state;
 
     if (!selectedAnswer) {
       this.setState({ result: 'Please select an answer!' });
+      return;
+    }
+
+    if (!playerName) {
+      this.setState({ result: 'Please enter your name!' });
       return;
     }
 
@@ -50,8 +61,13 @@ class PlayerComponent extends Component {
     this.setState({ selectedAnswer: e.target.value });
   };
 
+  handleNameChange = (e) => {
+    this.setState({ playerName: e.target.value });
+    localStorage.setItem('playerName', e.target.value); // Store the name in local storage
+  };
+
   render() {
-    const { currentQuestion, result, gameEnded } = this.state;
+    const { currentQuestion, result, gameEnded, playerName } = this.state;
 
     if (gameEnded) {
       return <h1 className="game-end">{result}</h1>;
@@ -59,7 +75,18 @@ class PlayerComponent extends Component {
 
     return (
       <div className="container">
-        {currentQuestion && (
+        {!playerName && (
+          <div>
+            <h2>Enter your name</h2>
+            <input
+              type="text"
+              value={playerName}
+              onChange={this.handleNameChange}
+              placeholder="Your Name"
+            />
+          </div>
+        )}
+        {currentQuestion && playerName && (
           <div>
             <h2>{currentQuestion.question}</h2>
             <form onSubmit={this.handleSubmit}>
