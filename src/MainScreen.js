@@ -14,17 +14,24 @@ class MainScreen extends Component {
   }
 
   componentDidMount() {
+    const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
+    if (savedQuestionIndex) {
+      this.socket.emit('resume_game', { questionIndex: savedQuestionIndex });
+    }
+
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
+      localStorage.setItem('currentQuestionIndex', question.index);
     });
 
     this.socket.on('result', (data) => {
-      const message = `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}`;
+      const message = data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!';
       this.setState({ result: message });
     });
 
     this.socket.on('end_game', (data) => {
       this.setState({ gameEnded: true, result: data.message });
+      localStorage.removeItem('currentQuestionIndex');
     });
   }
 
