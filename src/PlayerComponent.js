@@ -1,3 +1,4 @@
+// PlayerComponent.js
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 
@@ -45,6 +46,7 @@ class PlayerComponent extends Component {
     }
 
     this.socket.emit('submit_answer', { playerName: this.state.playerName, answer: selectedAnswer });
+    this.setState({ selectedAnswer: '' });
   };
 
   handleAnswerChange = (e) => {
@@ -63,7 +65,11 @@ class PlayerComponent extends Component {
         {!playerName && (
           <div>
             <h2>Enter your name</h2>
-            <input type="text" onChange={(e) => this.setState({ playerName: e.target.value })} />
+            <input 
+              type="text" 
+              onChange={(e) => this.setState({ playerName: e.target.value })} 
+            />
+            {this.state.playerName === '' && <span>Please enter your name to continue.</span>}
           </div>
         )}
         {currentQuestion && playerName && (
