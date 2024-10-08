@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
-import './App.css';
-
 
 class PlayerComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       playerName: '',
-      answer: '',
       currentQuestion: null,
+      selectedAnswer: '',
       result: '',
       gameEnded: false,
     };
@@ -22,7 +20,7 @@ class PlayerComponent extends Component {
     });
 
     this.socket.on('result', (data) => {
-      this.setState({ result: `${data.player} answered ${data.result === 'correct' ? 'correctly' : 'wrongly'}` });
+      this.setState({ result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}` });
     });
 
     this.socket.on('end_game', (data) => {
@@ -30,33 +28,34 @@ class PlayerComponent extends Component {
     });
   }
 
-  handleNameChange = (e) => {
-    this.setState({ playerName: e.target.value });
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const { selectedAnswer, currentQuestion } = this.state;
+
+    if (selectedAnswer === currentQuestion.correctAnswer) {
+      this.socket.emit('answer', { player: this.state.playerName, answer: selectedAnswer });
+    } else {
+      this.setState({ result: 'Wrong Answer. Retry!' });
+    }
   };
 
   handleAnswerChange = (e) => {
-    this.setState({ answer: e.target.value });
-  };
-
-  handleSubmit = (e) => {
-    e.preventDefault();
-    const { playerName, answer } = this.state;
-    this.socket.emit('submit_answer', { answer, playerName });
+    this.setState({ selectedAnswer: e.target.value });
   };
 
   render() {
     const { currentQuestion, result, playerName, gameEnded } = this.state;
 
     if (gameEnded) {
-      return <h1>{result}</h1>;
+      return <h1 className="game-end">{result}</h1>;
     }
 
     return (
-      <div>
+      <div className="container">
         {!playerName && (
           <div>
             <h2>Enter your name</h2>
-            <input type="text" onChange={this.handleNameChange} value={playerName} />
+            <input type="text" onChange={(e) => this.setState({ playerName: e.target.value })} />
           </div>
         )}
         {currentQuestion && playerName && (
@@ -78,7 +77,7 @@ class PlayerComponent extends Component {
               ))}
               <button type="submit">Submit Answer</button>
             </form>
-            {result && <h3>{result}</h3>}
+            {result && <h3 className="result">{result}</h3>}
           </div>
         )}
       </div>

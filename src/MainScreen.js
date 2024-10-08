@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 import { QRCodeCanvas } from 'qrcode.react';
-import './App.css';
 
 
 class MainScreen extends Component {
@@ -21,7 +20,8 @@ class MainScreen extends Component {
     });
 
     this.socket.on('result', (data) => {
-      this.setState({ result: `${data.player} answered ${data.result === 'correct' ? 'correctly' : 'wrongly'}` });
+      const message = `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}`;
+      this.setState({ result: message });
     });
 
     this.socket.on('end_game', (data) => {
@@ -34,11 +34,11 @@ class MainScreen extends Component {
     const qrCodeUrl = 'https://kbcgame-drab.vercel.app/player';
 
     if (gameEnded) {
-      return <h1>{result}</h1>;
+      return <h1 className="game-end">{result}</h1>;
     }
 
     return (
-      <div>
+      <div className="container">
         <h1>Main Screen</h1>
         {currentQuestion && (
           <div>
@@ -51,8 +51,9 @@ class MainScreen extends Component {
           </div>
         )}
         {result && <h3>{result}</h3>}
-        <h2>Scan to Join</h2>
-        <QRCodeCanvas value={qrCodeUrl} />
+        <div className="qr-code-container">
+          <QRCodeCanvas value={qrCodeUrl} />
+        </div>
       </div>
     );
   }

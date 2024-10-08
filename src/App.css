@@ -1,4 +1,3 @@
-/* Reset some default styles */
 * {
   margin: 0;
   padding: 0;
@@ -55,14 +54,12 @@ h3 {
   margin-top: 20px;
 }
 
-/* For QR Code display */
 .qr-code-container {
   display: flex;
   justify-content: center;
   margin-top: 20px;
 }
 
-/* Form Styling */
 form {
   display: flex;
   flex-direction: column;
@@ -93,7 +90,6 @@ button:hover {
   margin-top: 20px;
 }
 
-/* Game ended styling */
 .game-end {
   text-align: center;
   font-size: 24px;
