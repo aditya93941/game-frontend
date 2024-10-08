@@ -30,13 +30,14 @@ class PlayerComponent extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    const { selectedAnswer, currentQuestion } = this.state;
+    const { selectedAnswer } = this.state;
 
-    if (selectedAnswer === currentQuestion.correctAnswer) {
-      this.socket.emit('answer', { player: this.state.playerName, answer: selectedAnswer });
-    } else {
-      this.setState({ result: 'Wrong Answer. Retry!' });
+    if (!selectedAnswer) {
+      this.setState({ result: 'Please select an answer!' });
+      return;
     }
+
+    this.socket.emit('submit_answer', { playerName: this.state.playerName, answer: selectedAnswer });
   };
 
   handleAnswerChange = (e) => {
