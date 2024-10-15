@@ -22,7 +22,6 @@ class PlayerComponent extends Component {
 
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
-      // Save the current question index in localStorage
       localStorage.setItem('currentQuestionIndex', question.index);
     });
 
