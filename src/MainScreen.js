@@ -3,15 +3,13 @@ import io from 'socket.io-client';
 import { QRCodeCanvas } from 'qrcode.react';
 
 class MainScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentQuestion: null,
-      result: '',
-      gameEnded: false,
-    };
-    this.socket = io('https://kbc-game-backend-xqwf.onrender.com');
-  }
+  state = {
+    currentQuestion: null,
+    result: '',
+    gameEnded: false,
+  };
+
+  socket = io('https://kbc-game-backend-xqwf.onrender.com');
 
   componentDidMount() {
     const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
