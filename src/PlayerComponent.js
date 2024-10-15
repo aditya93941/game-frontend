@@ -2,17 +2,15 @@ import React, { Component } from 'react';
 import io from 'socket.io-client';
 
 class PlayerComponent extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      playerName: '',
-      currentQuestion: null,
-      selectedAnswer: '',
-      result: '',
-      gameEnded: false,
-    };
-    this.socket = io('https://kbc-game-backend-xqwf.onrender.com');
-  }
+  state = {
+    playerName: '',
+    currentQuestion: null,
+    selectedAnswer: '',
+    result: '',
+    gameEnded: false,
+  };
+
+  socket = io('https://kbc-game-backend-xqwf.onrender.com');
 
   componentDidMount() {
     const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
