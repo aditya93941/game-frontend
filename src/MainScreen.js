@@ -21,7 +21,6 @@ class MainScreen extends Component {
 
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
-      // Save the current question index in localStorage
       localStorage.setItem('currentQuestionIndex', question.index);
     });
 
@@ -32,7 +31,7 @@ class MainScreen extends Component {
 
     this.socket.on('end_game', (data) => {
       this.setState({ gameEnded: true, result: data.message });
-      localStorage.removeItem('currentQuestionIndex'); // Clear the stored index when the game ends
+      localStorage.removeItem('currentQuestionIndex');
     });
   }
 
