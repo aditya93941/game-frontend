@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 
 class PlayerComponent extends Component {
   state = {
-    playerName: '',
     currentQuestion: null,
     selectedAnswer: '',
     result: '',
@@ -24,7 +23,7 @@ class PlayerComponent extends Component {
     });
 
     this.socket.on('result', (data) => {
-      this.setState({ result: ${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'} });
+      this.setState({ result: data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!' });
     });
 
     this.socket.on('end_game', (data) => {
@@ -42,7 +41,7 @@ class PlayerComponent extends Component {
       return;
     }
 
-    this.socket.emit('submit_answer', { playerName: this.state.playerName, answer: selectedAnswer });
+    this.socket.emit('submit_answer', { answer: selectedAnswer });
   };
 
   handleAnswerChange = (e) => {
@@ -50,7 +49,7 @@ class PlayerComponent extends Component {
   };
 
   render() {
-    const { currentQuestion, result, playerName, gameEnded } = this.state;
+    const { currentQuestion, result, gameEnded } = this.state;
 
     if (gameEnded) {
       return <h1 className="game-end">{result}</h1>;
@@ -58,13 +57,7 @@ class PlayerComponent extends Component {
 
     return (
       <div className="container">
-        {!playerName && (
-          <div>
-            <h2>Enter your name</h2>
-            <input type="text" onChange={(e) => this.setState({ playerName: e.target.value })} />
-          </div>
-        )}
-        {currentQuestion && playerName && (
+        {currentQuestion && (
           <div>
             <h2>{currentQuestion.question}</h2>
             <form onSubmit={this.handleSubmit}>
