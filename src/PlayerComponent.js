@@ -24,7 +24,9 @@ class PlayerComponent extends Component {
     });
 
     this.socket.on('result', (data) => {
-      this.setState({ result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}` });
+      this.setState({
+        result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}`,
+      });
     });
 
     this.socket.on('end_game', (data) => {
@@ -33,16 +35,25 @@ class PlayerComponent extends Component {
     });
   }
 
+  handleNameSubmit = (e) => {
+    e.preventDefault();
+    if (!this.state.playerName) {
+      this.setState({ result: 'Please enter your name to continue!' });
+      return;
+    }
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
-    const { selectedAnswer } = this.state;
+    const { selectedAnswer, playerName } = this.state;
 
     if (!selectedAnswer) {
       this.setState({ result: 'Please select an answer!' });
       return;
     }
 
-    this.socket.emit('submit_answer', { playerName: this.state.playerName, answer: selectedAnswer });
+    // Emit the player's answer along with their name
+    this.socket.emit('submit_answer', { playerName, answer: selectedAnswer });
   };
 
   handleAnswerChange = (e) => {
@@ -61,7 +72,15 @@ class PlayerComponent extends Component {
         {!playerName && (
           <div>
             <h2>Enter your name</h2>
-            <input type="text" onChange={(e) => this.setState({ playerName: e.target.value })} />
+            <form onSubmit={this.handleNameSubmit}>
+              <input
+                type="text"
+                placeholder="Your Name"
+                onChange={(e) => this.setState({ playerName: e.target.value })}
+              />
+              <button type="submit">Start Game</button>
+            </form>
+            {result && <h3 className="result">{result}</h3>}
           </div>
         )}
         {currentQuestion && playerName && (
