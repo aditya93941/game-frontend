@@ -10,38 +10,21 @@ class PlayerComponent extends Component {
     gameEnded: false,
   };
 
-  socket = io('https://kbc-game-backend-xqwf.onrender.com');
+  socket = io('http://localhost:4000'); // Update to your server address
 
   componentDidMount() {
-    const savedQuestionIndex = localStorage.getItem('currentQuestionIndex');
-    if (savedQuestionIndex) {
-      this.socket.emit('resume_game', { questionIndex: savedQuestionIndex });
-    }
-
     this.socket.on('question', (question) => {
       this.setState({ currentQuestion: question, result: '' });
-      localStorage.setItem('currentQuestionIndex', question.index);
     });
 
     this.socket.on('result', (data) => {
-      this.setState({
-        result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Retry!'}`,
-      });
+      this.setState({ result: `${data.result === 'correct' ? 'Congratulations!' : 'Wrong Answer. Try again!'}` });
     });
 
     this.socket.on('end_game', (data) => {
       this.setState({ gameEnded: true, result: data.message });
-      localStorage.removeItem('currentQuestionIndex');
     });
   }
-
-  handleNameSubmit = (e) => {
-    e.preventDefault();
-    if (!this.state.playerName) {
-      this.setState({ result: 'Please enter your name to continue!' });
-      return;
-    }
-  };
 
   handleSubmit = (e) => {
     e.preventDefault();
@@ -52,7 +35,12 @@ class PlayerComponent extends Component {
       return;
     }
 
-    // Emit the player's answer along with their name
+    if (!playerName) {
+      this.setState({ result: 'Please enter your name!' });
+      return;
+    }
+
+    // Emit the answer and player's name to the backend
     this.socket.emit('submit_answer', { playerName, answer: selectedAnswer });
   };
 
@@ -64,7 +52,7 @@ class PlayerComponent extends Component {
     const { currentQuestion, result, playerName, gameEnded } = this.state;
 
     if (gameEnded) {
-      return <h1 className="game-end">{result}</h1>;
+      return <h1>{result}</h1>; // Display the final thank you message
     }
 
     return (
@@ -72,15 +60,11 @@ class PlayerComponent extends Component {
         {!playerName && (
           <div>
             <h2>Enter your name</h2>
-            <form onSubmit={this.handleNameSubmit}>
-              <input
-                type="text"
-                placeholder="Your Name"
-                onChange={(e) => this.setState({ playerName: e.target.value })}
-              />
-              <button type="submit">Start Game</button>
-            </form>
-            {result && <h3 className="result">{result}</h3>}
+            <input
+              type="text"
+              onChange={(e) => this.setState({ playerName: e.target.value })}
+              value={playerName}
+            />
           </div>
         )}
         {currentQuestion && playerName && (
@@ -102,7 +86,7 @@ class PlayerComponent extends Component {
               ))}
               <button type="submit">Submit Answer</button>
             </form>
-            {result && <h3 className="result">{result}</h3>}
+            {result && <h3>{result}</h3>}
           </div>
         )}
       </div>
