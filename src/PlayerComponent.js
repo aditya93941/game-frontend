@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import io from 'socket.io-client';
-import './PlayerComponent.css'; // Import the CSS file for styling
+// import './PlayerComponent.css'; // Import the CSS file for styling
 
 class PlayerComponent extends Component {
   state = {
